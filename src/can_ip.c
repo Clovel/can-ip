@@ -9,6 +9,8 @@
 #include "can_ip_error_codes.h"
 #include "can_ip.h"
 
+#include <stddef.h>
+
 /* Defines --------------------------------------------- */
 
 /* Type definitions ------------------------------------ */
@@ -24,7 +26,7 @@ int CIP_init(const cipID_t pID, const cipMode_t pCIPMode) {
     }
 
     /* Check if the module is already initialized */
-    if(gCIPInternalVars.isÌnitialized) {
+    if(gCIPInternalVars.isInitialized) {
         /* Module is already initialized,
          * so we do nothing */
         /* TODO : Maybe reset ? */
@@ -35,7 +37,7 @@ int CIP_init(const cipID_t pID, const cipMode_t pCIPMode) {
     gCIPInternalVars.cipMode       = pCIPMode;
     gCIPInternalVars.cipInstanceID = pID;
     gCIPInternalVars.isStopped     = false;
-    gCIPInternalVars.isÌnitialized = true;
+    gCIPInternalVars.isInitialized = true;
 
     return CAN_IP_ERROR_NONE;
 }
@@ -43,7 +45,7 @@ int CIP_init(const cipID_t pID, const cipMode_t pCIPMode) {
 int CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized) {
     if(NULL != pIsInitialized
         && gCIPInternalVars.cipInstanceID == pID) {
-        *pIsInitialized = gCIPInternalVars.isÌnitialized;
+        *pIsInitialized = gCIPInternalVars.isInitialized;
     } else {
         return CAN_IP_ERROR_ARG;
     }
@@ -52,18 +54,21 @@ int CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized) {
 }
 
 int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode) {
-    if(!gCIPInternalVars.isÌnitialized) {
+    if(!gCIPInternalVars.isInitialized) {
         /* You shouldn't "reset" a non-initialized module */
         return CAN_IP_ERROR_NOT_INIT;
     }
 
     gCIPInternalVars.isStopped = true;
-    gCIPInternalVars.isÌnitialized = false;
-    CIP_init(pID, pCIPMode);
+    gCIPInternalVars.isInitialized = false;
+
+    return CIP_init(pID, pCIPMode);
 }
 
 int CIP_stop(const cipID_t pID) {
-    if(!gCIPInternalVars.isÌnitialized) {
+    (void)pID; /* TODO : Multiline CAN */
+
+    if(!gCIPInternalVars.isInitialized) {
         return CAN_IP_ERROR_NOT_INIT;
     }
     
@@ -73,7 +78,9 @@ int CIP_stop(const cipID_t pID) {
 }
 
 int CIP_restart(const cipID_t pID) {
-    if(!gCIPInternalVars.isÌnitialized) {
+    (void)pID; /* TODO : Multiline CAN */
+
+    if(!gCIPInternalVars.isInitialized) {
         return CAN_IP_ERROR_NOT_INIT;
     }
     

@@ -17,9 +17,9 @@
 
 /* Type definitions ------------------------------------ */
 typedef struct _cipInternalVariables {
-    uint8_t   cipInstanceID;
+    uint8_t   cipInstanceID; /* TODO : Multiline CAN */
     cipMode_t cipMode;
-    bool      isÌnitialized;
+    bool      isInitialized;
     bool      isStopped;
 } cipInternalStruct_t;
 

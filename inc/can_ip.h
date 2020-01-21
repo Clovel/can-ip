@@ -12,7 +12,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes -------------------------------------------- */
-#include <stdint.h> /* TODO : Delete this and use custom types */
+#include <stdint.h>  /* TODO : Delete this and use custom types */
+#include <stdbool.h> /* TODO : Delete this and use custom types */
 
 /* Defines --------------------------------------------- */
 #define CAN_MESSAGE_MAX_SIZE 8U
@@ -53,14 +54,14 @@ int CIP_init(const cipID_t pID, const cipMode_t pCIPMode);
  * 
  * @return error code
  */
-int CIP_isInitialized(const cipID_t pID);
+int CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized);
 
 /**
  * @brief CAN over IP reset
  * 
  * @return error code
  */
-int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode = CIP_MODE_UNKNOWN);
+int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode);
 
 /**
  * @brief CAN over IP stop

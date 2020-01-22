@@ -37,6 +37,16 @@ int CIP_init(const cipID_t pID, const cipMode_t pCIPMode) {
     gCIPInternalVars.cipMode       = pCIPMode;
     gCIPInternalVars.cipInstanceID = pID;
     gCIPInternalVars.isStopped     = false;
+
+    /* TODO : Remove this w/ correct config mechanism */
+    gCIPInternalVars.canIP   = "192.168.1.255";
+    gCIPInternalVars.canPort = 560;
+
+    /* Initialize the socket */
+    if(CAN_IP_ERROR_NONE != CIP_initCanSocket(pID)) {
+        return CAN_IP_ERROR_NET;
+    }
+
     gCIPInternalVars.isInitialized = true;
 
     return CAN_IP_ERROR_NONE;
@@ -61,6 +71,11 @@ int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode) {
 
     gCIPInternalVars.isStopped = true;
     gCIPInternalVars.isInitialized = false;
+
+    /* Close the socket */
+    if(CAN_IP_ERROR_NONE != CIP_closeSocket(pID)) {
+        return CAN_IP_ERROR_NET;
+    }
 
     return CIP_init(pID, pCIPMode);
 }

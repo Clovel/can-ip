@@ -23,16 +23,18 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING
     FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+message(STATUS "Build type is : ${CMAKE_BUILD_TYPE}")
+
 # CASE OF C PROJECT
 set(CMAKE_C_STANDARD 99)
 if(NOT CMAKE_C_FLAGS)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wformat-security " CACHE STRING "C99 compilation flags" FORCE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wformat-security -pedantic" CACHE STRING "C99 compilation flags" FORCE)
 endif(NOT CMAKE_C_FLAGS)
 
 # CASE OF CPP PROJECT
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 if(NOT CMAKE_CXX_FLAGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat-security" CACHE STRING "C++11 compilation flags" FORCE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat-security -pedantic" CACHE STRING "C++17 compilation flags" FORCE)
 endif(NOT CMAKE_CXX_FLAGS)
 
 #------------------------------------------------------------------------------
@@ -45,7 +47,7 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_PROJECT_BRIEF "CAN over IP library")
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/image CACHE PATH "" FORCE)
+    set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dest CACHE PATH "" FORCE)
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 message(STATUS "Pkgconfig extra path are: $ENV{PKG_CONFIG_PATH} ")
@@ -55,6 +57,7 @@ enable_testing()
 
 # Allow subdirectory test and docs
 option(ENABLE_TESTS "Enable Tests" 1)
+option(ENABLE_EXAMPLES "Enable Examples" 1)
 
 find_package(Doxygen)
 option(ENABLE_DOCS "Build API documentation" ${DOXYGEN_FOUND})
@@ -139,6 +142,13 @@ if(ENABLE_DOCS)
 else()
     message(STATUS "DOCS disabled")
 endif (ENABLE_DOCS)
+
+if(ENABLE_EXAMPLES)
+    message(STATUS "EXAMPLES enabled")
+    add_subdirectory(examples)
+else()
+    message(STATUS "EXAMPLES disabled")
+endif (ENABLE_EXAMPLES)
 
 #------------------------------------------------------------------------------
 # Gencov custom command

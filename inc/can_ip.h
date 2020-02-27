@@ -43,6 +43,8 @@ typedef enum _cipModes {
     CAN_IP_MODE_FD      = 2U
 } cipMode_t;
 
+typedef cipMode_t canMode_t;
+
 typedef uint8_t cipID_t;
 typedef int cipPort_t;
 

@@ -12,6 +12,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes -------------------------------------------- */
+#include "can_ip_error_codes.h"
+
 #include <stdint.h>  /* TODO : Delete this and use custom types */
 #include <stdbool.h> /* TODO : Delete this and use custom types */
 
@@ -51,58 +53,72 @@ typedef uint8_t cipID_t;
  * 
  * @return Error code
  */
-int CIP_createModule(const cipID_t pID);
+cipErrorCode_t CIP_createModule(const cipID_t pID);
 
 /**
  * @brief CAN over IP initialisation
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_init(const cipID_t pID, const cipMode_t pCIPMode);
+cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort);
 
 /**
  * @brief CAN over IP check for initialisation
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized);
+cipErrorCode_t CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized);
 
 /**
  * @brief CAN over IP reset
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode);
+cipErrorCode_t CIP_reset(const cipID_t pID, const cipMode_t pCIPMode);
 
 /**
  * @brief CAN over IP stop
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_stop(const cipID_t pID);
+cipErrorCode_t CIP_stop(const cipID_t pID);
 
 /**
  * @brief CAN over IP restart
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_restart(const cipID_t pID);
+cipErrorCode_t CIP_restart(const cipID_t pID);
 
 /** 
  * @brief CAN over IP send
  * Use this function to send a CAN message
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_send(const cipID_t pID, const cipMessage_t * const pMsg);
+cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg);
 
 /**
  * @brief CAN over IP recieve
  * Use this function to get a CAN message
  * 
+ * @param[in]   pID     ID of the driver used.
+ * 
  * @return error_code
  */
-int CIP_recv(const cipID_t pID, cipMessage_t * const pMsg);
+cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes);
 
 #ifndef CIP_THREADED_PROCESS
 /**

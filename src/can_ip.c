@@ -20,7 +20,7 @@
 cipInternalStruct_t gCIPInternalVars;
 
 /* CAN over IP main functions -------------------------- */
-int CIP_createModule(const cipID_t pID) {
+cipErrorCode_t CIP_createModule(const cipID_t pID) {
     if(CAN_IP_MAX_NB_MODULES <= pID) {
         return CAN_IP_ERROR_ARG;
     }
@@ -35,7 +35,7 @@ int CIP_createModule(const cipID_t pID) {
     return CAN_IP_ERROR_NONE;
 }
 
-int CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort) {
+cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort) {
     /* Check the ID */
     if(pID != gCIPInternalVars.cipInstanceID) {
         printf("[ERROR] <CIP_init> No CAN-IP module has the ID %u\n", pID);
@@ -61,7 +61,7 @@ int CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort)
     return CAN_IP_ERROR_NONE;
 }
 
-int CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized) {
+cipErrorCode_t CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized) {
     if(NULL != pIsInitialized
         && gCIPInternalVars.cipInstanceID == pID)
     {
@@ -74,7 +74,7 @@ int CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized) {
     return CAN_IP_ERROR_NONE;
 }
 
-int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode) {
+cipErrorCode_t CIP_reset(const cipID_t pID, const cipMode_t pCIPMode) {
     if(!gCIPInternalVars.isInitialized) {
         /* You shouldn't "reset" a non-initialized module */
         printf("[ERROR] <CIP_reset> CAN-IP module %u is not initialized, cannot reset.\n", pID);
@@ -92,7 +92,7 @@ int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode) {
     return CIP_init(pID, pCIPMode, gCIPInternalVars.canPort);
 }
 
-int CIP_stop(const cipID_t pID) {
+cipErrorCode_t CIP_stop(const cipID_t pID) {
     (void)pID; /* TODO : Multiline CAN */
 
     if(!gCIPInternalVars.isInitialized) {
@@ -105,7 +105,7 @@ int CIP_stop(const cipID_t pID) {
     return CAN_IP_ERROR_NONE;
 }
 
-int CIP_restart(const cipID_t pID) {
+cipErrorCode_t CIP_restart(const cipID_t pID) {
     (void)pID; /* TODO : Multiline CAN */
 
     if(!gCIPInternalVars.isInitialized) {

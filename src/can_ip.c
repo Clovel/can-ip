@@ -20,7 +20,7 @@
 cipInternalStruct_t gCIPInternalVars;
 
 /* CAN over IP main functions -------------------------- */
-int CIP_init(const cipID_t pID, const cipMode_t pCIPMode) {
+int CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort) {
     /* Check the ID */
     if(pID != gCIPInternalVars.cipInstanceID) {
         printf("[ERROR] <CIP_init> No CAN-IP module has the ID %u\n", pID);
@@ -74,7 +74,7 @@ int CIP_reset(const cipID_t pID, const cipMode_t pCIPMode) {
         return CAN_IP_ERROR_NET;
     }
 
-    return CIP_init(pID, pCIPMode);
+    return CIP_init(pID, pCIPMode, gCIPInternalVars.canPort);
 }
 
 int CIP_stop(const cipID_t pID) {

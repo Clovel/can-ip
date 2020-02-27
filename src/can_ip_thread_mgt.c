@@ -40,7 +40,7 @@ cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID,
     }
 
     if(NULL == pFct) {
-        printf("[ERROR] <CIP_setPutMessageFunction> Function is NULL !\n");
+        printf("[ERROR] <CIP_setPutMessageFunction> Function ptr arg is NULL !\n");
         return CAN_IP_ERROR_ARG;
     }
 

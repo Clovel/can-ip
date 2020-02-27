@@ -45,6 +45,15 @@ typedef uint8_t cipID_t;
 
 /* CAN over IP interface ------------------------------- */
 /**
+ * @brief CAN over IP module creation
+ * 
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
+ */
+int CIP_createModule(const cipID_t pID);
+
+/**
  * @brief CAN over IP initialisation
  * 
  * @return error code

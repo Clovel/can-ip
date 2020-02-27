@@ -20,6 +20,21 @@
 cipInternalStruct_t gCIPInternalVars;
 
 /* CAN over IP main functions -------------------------- */
+int CIP_createModule(const cipID_t pID) {
+    if(CAN_IP_MAX_NB_MODULES <= pID) {
+        return CAN_IP_ERROR_ARG;
+    }
+
+    /* check if the module already exists */
+    if(gCIPInternalVars.cipInstanceID != pID) {
+        return CAN_IP_ERROR_ARG;
+    }
+
+    /* TODO */
+
+    return CAN_IP_ERROR_NONE;
+}
+
 int CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort) {
     /* Check the ID */
     if(pID != gCIPInternalVars.cipInstanceID) {

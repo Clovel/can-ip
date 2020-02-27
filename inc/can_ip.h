@@ -123,6 +123,20 @@ cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg);
  */
 cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes);
 
+/**
+ * @brief Print a CAN over IP message (long format)
+ * 
+ * @param[in]   pMsg    CAN Message to print
+ */
+void CIP_printMessage(const cipMessage_t * const pMsg);
+
+/**
+ * @brief Print a CAN over IP message (short format)
+ * 
+ * @param[in]   pMsg    CAN Message to print
+ */
+void CIP_printMessageShort(const cipMessage_t * const pMsg);
+
 #ifndef CIP_THREADED_PROCESS
 /**
  * @brief CAN over IP process

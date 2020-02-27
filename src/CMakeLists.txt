@@ -4,10 +4,11 @@
 # -----------------------------------------------------------------------------
 
 # Header files --------------------------------------------
-file(GLOB_RECURSE PUBLIC_HEADERS 
+file(GLOB_RECURSE PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/inc/*.h
     ${CMAKE_SOURCE_DIR}/inc/*.hpp
 )
+
 set(HEADERS
     ${PUBLIC_HEADERS}
 )

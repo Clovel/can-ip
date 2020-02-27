@@ -8,6 +8,7 @@
 #include "can_ip_private.h"
 #include "can_ip_error_codes.h"
 #include "can_ip.h"
+#include "can_ip_socket_mgt.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -55,6 +56,15 @@ cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPo
     gCIPInternalVars.cipMode       = pCIPMode;
     gCIPInternalVars.cipInstanceID = pID;
     gCIPInternalVars.isStopped     = false;
+
+    /* Set port */
+    gCIPInternalVars.canPort = pPort;
+
+    /* Initialize the socket */
+    if(CAN_IP_ERROR_NONE != CIP_initCanSocket(pID)) {
+        printf("[ERROR] <CIP_init> Failed to initialize socket w/ CIP_initCanSocket\n");
+        return CAN_IP_ERROR_NET;
+    }
 
     gCIPInternalVars.isInitialized = true;
 

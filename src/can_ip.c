@@ -66,6 +66,11 @@ cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPo
         return CAN_IP_ERROR_NET;
     }
 
+    /* Initialize thread related variables */
+    gCIPInternalVars.rxThreadOn    = false;
+    gCIPInternalVars.callerID      = 0U;
+    gCIPInternalVars.putMessageFct = NULL;
+
     gCIPInternalVars.isInitialized = true;
 
     return CAN_IP_ERROR_NONE;

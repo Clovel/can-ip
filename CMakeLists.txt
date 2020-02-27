@@ -55,6 +55,7 @@ enable_testing()
 
 # Allow subdirectory test and docs
 option(ENABLE_TESTS "Enable Tests" 1)
+option(ENABLE_EXAMPLES "Enable Examples" 1)
 
 find_package(Doxygen)
 option(ENABLE_DOCS "Build API documentation" ${DOXYGEN_FOUND})
@@ -142,6 +143,13 @@ if(ENABLE_DOCS)
 else()
     message(STATUS "DOCS disabled")
 endif (ENABLE_DOCS)
+
+if(ENABLE_EXAMPLES)
+    message(STATUS "EXAMPLES enabled")
+    add_subdirectory(examples)
+else()
+    message(STATUS "EXAMPLES disabled")
+endif (ENABLE_EXAMPLES)
 
 #------------------------------------------------------------------------------
 # Gencov custom command

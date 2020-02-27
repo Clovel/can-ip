@@ -44,6 +44,7 @@ typedef enum _cipModes {
 } cipMode_t;
 
 typedef uint8_t cipID_t;
+typedef int cipPort_t;
 
 /* CAN over IP interface ------------------------------- */
 /**

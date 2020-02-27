@@ -17,6 +17,8 @@ extern "C" {
 #include <stdint.h>  /* TODO : Delete this and use custom types */
 #include <stdbool.h> /* TODO : Delete this and use custom types */
 
+#include <sys/types.h>
+
 /* Defines --------------------------------------------- */
 #define CAN_MESSAGE_MAX_SIZE 8U
 
@@ -47,6 +49,8 @@ typedef cipMode_t canMode_t;
 
 typedef uint8_t cipID_t;
 typedef int cipPort_t;
+
+typedef int (*cipPutMessageFct_t)(const uint8_t, const uint32_t, const uint8_t, const uint8_t * const, const uint32_t);
 
 /* CAN over IP interface ------------------------------- */
 /**
@@ -124,6 +128,17 @@ cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg);
 cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes);
 
 /**
+ * @brief Sets the function used to give a message to
+ * the driver's caller's stack.
+ * 
+ * @param[in]   pID     ID of the driver used.
+ * @param[in]   pFct    Function used to hand the message over to the caller.
+ * 
+ * @return Error code
+ */
+cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID, const uint8_t pCallerID, const cipPutMessageFct_t pFct);
+
+/**
  * @brief Print a CAN over IP message (long format)
  * 
  * @param[in]   pMsg    CAN Message to print
@@ -137,16 +152,35 @@ void CIP_printMessage(const cipMessage_t * const pMsg);
  */
 void CIP_printMessageShort(const cipMessage_t * const pMsg);
 
-#ifndef CIP_THREADED_PROCESS
 /**
  * @brief CAN over IP process
  * This function can only be called from the exterior 
  * if CIP is compiled to use a non-threaded process
  * 
- * @return error code
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
  */
-int CIP_process(const cipID_t pID);
-#endif /* CIP_THREADED_PROCESS */
+cipErrorCode_t CIP_process(const cipID_t pID);
+
+/**
+ * @brief Starts the receiving thread.
+ * 
+ * @param[in]   pID     ID of the driver used.
+ * 
+ * @return Error code
+ */
+cipErrorCode_t CIP_startRxThread(const cipID_t pID);
+
+/**
+ * @brief Getter for the "Thread On" variable
+ * 
+ * @param[in]   pID     ID of the driver used.
+ * @param[out]  pOn     Output ptr. true : thread is running, false : thread is off.
+ * 
+ * @return Error code
+ */
+cipErrorCode_t CIP_isRxThreadOn(const cipID_t pID, bool * const pOn);
 
 #ifdef __cplusplus
 }

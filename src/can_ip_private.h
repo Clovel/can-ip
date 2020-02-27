@@ -11,6 +11,7 @@
 #include "can_ip.h"
 
 #include <netinet/in.h>
+#include <pthread.h>
 
 #include <stdint.h>  /* TODO : Delete this and use custom types */
 #include <stdbool.h> /* TODO : Delete this and use custom types */
@@ -33,6 +34,15 @@ typedef struct _cipInternalVariables {
     cipPort_t           canPort;    /* Server port number */
     struct hostent     *hostPtr;    /* Server information */
     struct addrinfo    *addrinfo;   /* Address information fetched w/ getaddrinfo */
+
+    /* Rx Thread */
+    bool rxThreadOn;
+    uint8_t callerID;
+    cipPutMessageFct_t putMessageFct;
+    pthread_mutex_t mutex;
 } cipInternalStruct_t;
+
+/* Private functions ----------------------------------- */
+cipErrorCode_t CIP_startRxThread(const cipID_t pID);
 
 #endif /* CAN_IP_PRIVATE_H */

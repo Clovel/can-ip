@@ -59,6 +59,9 @@ option(ENABLE_TESTS "Enable Tests" 1)
 find_package(Doxygen)
 option(ENABLE_DOCS "Build API documentation" ${DOXYGEN_FOUND})
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 #------------------------------------------------------------------------------
 # Project version
 #------------------------------------------------------------------------------

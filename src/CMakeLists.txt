@@ -27,6 +27,10 @@ file(GLOB_RECURSE SOURCES
 add_library(${CMAKE_PROJECT_NAME} SHARED
     ${SOURCES}
 )
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    Threads::Threads
+)
 
 #----------------------------------------------------------------------------
 # The installation is prepended by the CMAKE_INSTALL_PREFIX variable

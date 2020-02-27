@@ -21,7 +21,32 @@
 
 /* Type definitions ------------------------------------ */
 
+
+extern void CIP_printMessageShort(const cipMessage_t * const pMsg);
+
 /* Support functions ----------------------------------- */
+int inputMessage(const uint8_t pID, 
+    const uint32_t pCOBID,
+    const uint8_t pSize,
+    const uint8_t * const pData,
+    const uint32_t pFlags)
+{
+    (void)pID;
+
+    /* Set up CAN message */
+    cipMessage_t lMsg;
+    lMsg.id = pCOBID;
+    lMsg.size = pSize;
+    lMsg.flags = pFlags;
+
+    for(uint8_t i = 0U; (i < CAN_MESSAGE_MAX_SIZE) && (i < lMsg.size); i++) {
+        lMsg.data[i] = pData[i];
+    }
+
+    CIP_printMessageShort(&lMsg);
+
+    return 0;
+}
 
 /* ----------------------------------------------------- */
 /* Main ------------------------------------------------ */
@@ -35,6 +60,11 @@ int main(const int argc, const char * const * const argv) {
     /* Initialize the CAN over IP module */
     if(1U != (lErrorCode = CIP_init(0U, CAN_IP_MODE_NORMAL, 15024))) {
         printf("[ERROR] CIP_init failed w/ error code %u.\n", lErrorCode);
+        exit(EXIT_FAILURE);
+    }
+
+    if(1U != (lErrorCode = CIP_setPutMessageFunction(0U, 0U, inputMessage))) {
+        printf("[ERROR] CIP_setPutMessageFunction failed w/ error code %u.\n", lErrorCode);
         exit(EXIT_FAILURE);
     }
 
@@ -55,27 +85,25 @@ int main(const int argc, const char * const * const argv) {
         0x00000000U
     };
 
-    CIP_printMessage(&lMsg);
-
-    printf("[DEBUG] sizeof(cipMessage_t) = %lu\n", sizeof(cipMessage_t));
-    /* Send the CAN message over IP */
-    if(1U != (lErrorCode = CIP_send(0U, &lMsg))) {
-        printf("[ERROR] CIP_send failed w/ error code %u.\n", lErrorCode);
+    if(1U != (lErrorCode = CIP_startRxThread(0U))) {
+        printf("[ERROR] CIP_startRxThread failed w/ error code %u.\n", lErrorCode);
         exit(EXIT_FAILURE);
     }
-
-    /* reset the message structure before receiving */
-    memset(&lMsg, 0, sizeof(cipMessage_t));
 
     ssize_t lReadBytes = 0;
 
     /* Receive the CAN message over IP */
     while(lErrorCode == CAN_IP_ERROR_NONE && 0 >= lReadBytes) {
-        lErrorCode = CIP_recv(0U, &lMsg, &lReadBytes);
+        if(1U != (lErrorCode = CIP_send(0U, &lMsg))) {
+            printf("[ERROR] CIP_send failed w/ error code %u.\n", lErrorCode);
+            exit(EXIT_FAILURE);
+        }
+
+        sleep(1U);
     }
 
     if(CAN_IP_ERROR_NONE != lErrorCode) {
-        printf("[ERROR] CIP_recv failed w/ error code %u.\n", lErrorCode);
+        printf("[ERROR] sender-receiver failed w/ error code %u.\n", lErrorCode);
         exit(EXIT_FAILURE);
     }
 

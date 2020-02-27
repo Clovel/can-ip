@@ -139,6 +139,11 @@ cipErrorCode_t CIP_startRxThread(const cipID_t pID) {
         return CAN_IP_ERROR_ARG;
     }
 
+    if(NULL == gCIPInternalVars.putMessageFct) {
+        printf("[ERROR] <CIP_startRxThread> Message buffer getter function is NULL.\n");
+        return CAN_IP_ERROR_CONFIG;
+    }
+
     int lSysResult = 0;
     lSysResult = pthread_create(&sThread, NULL, (void * (*)(void *))CIP_rxThread, (void *)&pID);
     if (0 < lSysResult) {

@@ -28,10 +28,12 @@ extern "C" {
 /* Type definitions ------------------------------------ */
 typedef struct _cipMessage {
     uint32_t id;
-    uint8_t size;
-    uint8_t data[CAN_MESSAGE_MAX_SIZE];
-    uint8_t flags;
+    uint8_t  size;
+    uint8_t  data[CAN_MESSAGE_MAX_SIZE];
+    uint32_t flags;
 } cipMessage_t;
+
+typedef cipMessage_t canMessage_t;
 
 typedef enum _cipModes {
     CAN_IP_MODE_UNKNOWN = 0U,

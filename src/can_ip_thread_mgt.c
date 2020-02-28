@@ -86,9 +86,6 @@ static void CIP_rxThread(const cipID_t * const pID) {
     int             lGetBufferError = 0;
     ssize_t         lReadBytes      = 0;
 
-    cipMessage_t lMsg;
-    memset(&lMsg, 0, sizeof(cipMessage_t));
-
     /* Starting thread routine */
     pthread_cleanup_push((void (*)(void *))CIP_rxThreadCleanup, NULL);
 
@@ -97,6 +94,10 @@ static void CIP_rxThread(const cipID_t * const pID) {
     /* Infinite Rx loop */
     printf("[DEBUG] <CIP_rxThread> Starting RX thread.\n");
     while (CAN_IP_ERROR_NONE == lErrorCode) {
+        /* Initialize a CIP message */
+        cipMessage_t lMsg;
+        memset(&lMsg, 0, sizeof(cipMessage_t));
+        
         /* Reading a CAN message */
         lErrorCode = CIP_recv(lID, &lMsg, &lReadBytes);
         if(CAN_IP_ERROR_NONE != lErrorCode) {

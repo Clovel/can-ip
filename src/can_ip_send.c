@@ -55,7 +55,7 @@ cipErrorCode_t CIP_send(const cipID_t pID,
     lMsg.id    = pCANID;
     lMsg.size  = pSize;
     lMsg.flags = pFlags;
-    for(uint8_t i = 0U; (i < lMsg.size) && (i < CAN_MESSAGE_MAX_SIZE); i++) {
+    for(uint8_t i = 0U; (i < lMsg.size) && (i < CAN_MESSAGE_MAX_SIZE) && (NULL != pData); i++) {
         lMsg.data[i] = pData[i];
     }
     

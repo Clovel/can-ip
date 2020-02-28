@@ -115,6 +115,12 @@ static void CIP_rxThread(const cipID_t * const pID) {
             break;
         }
 
+        /* Check if the message is a loopback message from this instance of CIP */
+        if(gCIPInternalVars.randID == lMsg.randID) {
+            /* We sent this ! Ignoring... */
+            continue;
+        }
+
         /* Get buffer to store this data */
         lGetBufferError = gCIPInternalVars.putMessageFct(gCIPInternalVars.callerID, lMsg.id, lMsg.size, lMsg.data, lMsg.flags);
         if(0 != lGetBufferError) {

@@ -47,6 +47,7 @@ int main(const int argc, const char * const * const argv) {
         default:
             printf("[INFO ] test #%d not available", lTestNum);
             fflush(stdout);
+            (void)lResult;
             break;
     }
 

@@ -53,7 +53,7 @@ cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg) {
 
     errno = 0;
     lSentBytes = sendto(gCIPInternalVars.canSocket, (const void *)pMsg, sizeof(cipMessage_t), 0, 
-        (struct sockaddr *)&gCIPInternalVars.socketInAddress, sAddrLen);
+        (const struct sockaddr *)&gCIPInternalVars.socketInAddress, sAddrLen);
     if(sizeof(cipMessage_t) != lSentBytes) {
         printf("[ERROR] <CIP_send> sendto failed !\n");
         if(0 != errno) {

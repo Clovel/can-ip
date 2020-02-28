@@ -112,10 +112,18 @@ cipErrorCode_t CIP_restart(const cipID_t pID);
  * Use this function to send a CAN message
  * 
  * @param[in]   pID     ID of the driver used.
+ * @param[in]   pCANID  CAN message ID.
+ * @param[in]   pSize   CAN message size.
+ * @param[in]   pData   CAN message data.
+ * @param[in]   pFlags  CAN message flags.
  * 
  * @return Error code
  */
-cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg);
+cipErrorCode_t CIP_send(const cipID_t pID,
+    const uint32_t pCANID,
+    const uint8_t pSize,
+    const uint8_t * const pData,
+    const uint32_t pFlags);
 
 /**
  * @brief CAN over IP recieve

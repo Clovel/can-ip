@@ -29,7 +29,12 @@ static const socklen_t sAddrLen = sizeof(struct sockaddr);
 extern cipInternalStruct_t gCIPInternalVars;
 
 
-cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg) {
+cipErrorCode_t CIP_send(const cipID_t pID,
+    const uint32_t pCANID,
+    const uint8_t pSize,
+    const uint8_t * const pData,
+    const uint32_t pFlags)
+{
     pthread_mutex_lock(&gCIPInternalVars.mutex);
 
     /* Check the ID */
@@ -44,15 +49,20 @@ cipErrorCode_t CIP_send(const cipID_t pID, const cipMessage_t * const pMsg) {
         return CAN_IP_ERROR_NOT_INIT;
     }
 
-    if(NULL == pMsg) {
-        printf("[ERROR] <CIP_send> Message to send is NULL\n");
-        return CAN_IP_ERROR_ARG;
+    /* Build CIP message */
+    cipMessage_t lMsg;
+    memset(lMsg.data, 0, CAN_MESSAGE_MAX_SIZE);
+    lMsg.id    = pCANID;
+    lMsg.size  = pSize;
+    lMsg.flags = pFlags;
+    for(uint8_t i = 0U; (i < lMsg.size) && (i < CAN_MESSAGE_MAX_SIZE); i++) {
+        lMsg.data[i] = pData[i];
     }
 
     ssize_t lSentBytes = 0;
 
     errno = 0;
-    lSentBytes = sendto(gCIPInternalVars.canSocket, (const void *)pMsg, sizeof(cipMessage_t), 0, 
+    lSentBytes = sendto(gCIPInternalVars.canSocket, (const void *)&lMsg, sizeof(cipMessage_t), 0, 
         (const struct sockaddr *)&gCIPInternalVars.socketInAddress, sizeof(gCIPInternalVars.socketInAddress));
     if(sizeof(cipMessage_t) != lSentBytes) {
         printf("[ERROR] <CIP_send> sendto failed !\n");

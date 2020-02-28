@@ -95,7 +95,7 @@ int main(const int argc, const char * const * const argv) {
 
     /* Receive the CAN message over IP */
     while(lErrorCode == CAN_IP_ERROR_NONE && 0 >= lReadBytes) {
-        if(1U != (lErrorCode = CIP_send(0U, &lMsg))) {
+        if(1U != (lErrorCode = CIP_send(0U, lMsg.id, lMsg.size, lMsg.data, lMsg.flags))) {
             printf("[ERROR] CIP_send failed w/ error code %u.\n", lErrorCode);
             exit(EXIT_FAILURE);
         }

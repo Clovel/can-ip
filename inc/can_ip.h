@@ -35,6 +35,7 @@ typedef struct _cipMessage {
     uint8_t  size;
     uint8_t  data[CAN_MESSAGE_MAX_SIZE];
     uint32_t flags;
+    uint32_t randID; /**< Random ID of the message sender */
 } cipMessage_t;
 
 typedef cipMessage_t canMessage_t;

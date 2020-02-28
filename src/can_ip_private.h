@@ -27,7 +27,10 @@ typedef struct _cipInternalVariables {
     bool      isInitialized;
     bool      isStopped;
 
-    /* sockeS */
+    /* Random ID */
+    uint32_t randID; /**< Random ID to ignore our own messages upon reception */
+
+    /* Socket */
     cipSocket_t         canSocket; /* The socket used to communicate CAN frames */
     struct sockaddr_in  socketInAddress;
     char               *canIP;      /* IP Address */

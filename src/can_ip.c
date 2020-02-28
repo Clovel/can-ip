@@ -12,6 +12,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h> /* For rand() */
 
 /* Defines --------------------------------------------- */
 
@@ -59,6 +60,15 @@ cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPo
 
     /* Set port */
     gCIPInternalVars.canPort = pPort;
+
+    /* Generate random ID */
+    time_t lTime;
+    srand((unsigned)time(&lTime));
+    gCIPInternalVars.randID  = (rand() & 0xFFU) << 0U;
+    gCIPInternalVars.randID |= (rand() & 0xFFU) << 8U;
+    gCIPInternalVars.randID |= (rand() & 0xFFU) << 16U;
+    gCIPInternalVars.randID |= (rand() & 0xFFU) << 24U;
+    printf("[DEBUG] Generated random ID : %u\n", gCIPInternalVars.randID);
 
     /* Initialize the socket */
     if(CAN_IP_ERROR_NONE != CIP_initCanSocket(pID)) {

@@ -57,7 +57,7 @@ cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * 
     *pReadBytes = 0;
     struct sockaddr_in lSrcAddr;
     socklen_t lSrcAddrLen = sizeof(lSrcAddr);
-    char lSrcIPAddr[INET_ADDRSTRLEN] = "";
+    //char lSrcIPAddr[INET_ADDRSTRLEN] = "";
     
     /* Receive the CAN frame */
     *pReadBytes = recvfrom(gCIPInternalVars.canSocket, (void *)pMsg, sizeof(cipMessage_t), 0, 

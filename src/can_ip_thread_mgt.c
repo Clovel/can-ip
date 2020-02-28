@@ -111,7 +111,7 @@ static void CIP_rxThread(const cipID_t * const pID) {
         }
         
         if(sizeof(cipMessage_t) != lReadBytes) {
-            printf("[ERROR] <CIP_rxThread> CIP_recv received inconsistent data of size %ld\n", lReadBytes);
+            printf("[ERROR] <CIP_rxThread> CIP_recv received inconsistent data of size %d\n", lReadBytes);
             break;
         }
 

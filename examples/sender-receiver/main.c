@@ -83,6 +83,7 @@ int main(const int argc, const char * const * const argv) {
             0xCDU,
             0xEFU
         },
+        0x00000000U,
         0x00000000U
     };
 

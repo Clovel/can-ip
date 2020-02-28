@@ -53,12 +53,10 @@ int main(const int argc, const char * const * const argv) {
             0xCDU,
             0xEFU
         },
+        0x00000000U,
         0x00000000U
     };
-
-    //CIP_printMessage(&lMsg);
-
-    printf("[DEBUG] sizeof(cipMessage_t) = %lu\n", sizeof(cipMessage_t));
+    
     /* Send the CAN message over IP */
     while(CAN_IP_ERROR_NONE == lErrorCode) {
         if(1U != (lErrorCode = CIP_send(0U, lMsg.id, lMsg.size, lMsg.data, lMsg.flags))) {

@@ -34,7 +34,6 @@
 /* Global variables ------------------------------------ */
 
 /* Static variables ------------------------------------ */
-static const socklen_t sAddrLen = sizeof(struct sockaddr);
 
 /* Extern variables ------------------------------------ */
 extern cipInternalStruct_t gCIPInternalVars;

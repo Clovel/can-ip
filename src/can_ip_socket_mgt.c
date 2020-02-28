@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <ifaddrs.h>
 
 /* C system */
 #include <unistd.h>
@@ -39,64 +40,84 @@ static const socklen_t sAddrLen = sizeof(struct sockaddr);
 extern cipInternalStruct_t gCIPInternalVars;
 
 /* Socket management functions ------------------------- */
+static cipErrorCode_t listNetItfs(void) {
+    /* List available network interfaces */
+    struct ifaddrs *lIfAddrs = NULL;
+
+    if(0 > getifaddrs(&lIfAddrs)) {
+        printf("[ERROR] <CIP_initcanSocket> getifaddrs failed !\n");
+        if(0 != errno) {
+            printf("        errno = %d (%s)\n", errno, strerror(errno));
+        }
+
+        return CAN_IP_ERROR_NET;
+    }
+
+    struct ifaddrs *lTmpIfAddr = lIfAddrs;
+    while (lTmpIfAddr) 
+    {
+        if (lTmpIfAddr->ifa_addr && lTmpIfAddr->ifa_addr->sa_family == PF_INET)
+        {
+            struct sockaddr_in *pAddr = (struct sockaddr_in *)lTmpIfAddr->ifa_addr;
+            printf("%s: %s\n", lTmpIfAddr->ifa_name, inet_ntoa(pAddr->sin_addr));
+        }
+
+        lTmpIfAddr = lTmpIfAddr->ifa_next;
+    }
+
+    freeifaddrs(lIfAddrs);
+
+    return CAN_IP_ERROR_NONE;
+}
+
 cipErrorCode_t CIP_initCanSocket(const cipID_t pID) {
     (void) pID;
-
-    const int lBroadcastPermission = 1;
 
     /* Construct local address structure */
     gCIPInternalVars.socketInAddress.sin_family         = PF_INET;
     gCIPInternalVars.socketInAddress.sin_port           = htons(gCIPInternalVars.canPort);
     // gCIPInternalVars.socketInAddress.sin_addr.s_addr    = inet_addr(gCIPInternalVars.canIP);
-    gCIPInternalVars.socketInAddress.sin_addr.s_addr    = INADDR_ANY;
-
-    // /* Get socket information */
-    // struct addrinfo lHints = {
-    //     .ai_family = AF_UNSPEC,
-    //     .ai_socktype = SOCK_DGRAM,
-    //     .ai_protocol = IPPROTO_UDP
-    // };
-
-    // int lFctReturn = getaddrinfo(gCIPInternalVars.canIP, itoa(gCIPInternalVars.canPort), &lHints, &gCIPInternalVars.addrinfo);
-    // if(0 != lFctReturn || NULL == gCIPInternalVars.addrinfo) {
-    //     printf("[ERROR] <CIP_initcanSocket> getaddrinfo failed !\n");
-    //     printf("        Invalid address (%s) or port (%d)\n", gCIPInternalVars.canIP, gCIPInternalVars.canPort);
-    //     return CAN_IP_ERROR_NET;
-    // }
+    gCIPInternalVars.socketInAddress.sin_addr.s_addr    = INADDR_ANY; /* Set it to INADDR_ANY to bind */
 
     printf("[DEBUG] <CIP_initcanSocket> IPAddr = %s\n", gCIPInternalVars.canIP);
     printf("[DEBUG] <CIP_initcanSocket> Port   = %d\n", gCIPInternalVars.canPort);
     
     /* Create the UDP socket (DGRAM for UDP */
     errno = 0;
-    if(0 > (gCIPInternalVars.canSocket = socket(gCIPInternalVars.socketInAddress.sin_family, SOCK_DGRAM, IPPROTO_UDP))) {
+    if(0 > (gCIPInternalVars.canSocket = socket(gCIPInternalVars.socketInAddress.sin_family, SOCK_DGRAM, IPPROTO_IP))) {
         printf("[ERROR] <CIP_initcanSocket> socket failed !\n");
         if(0 != errno) {
             printf("        errno = %d (%s)\n", errno, strerror(errno));
         }
-
-        freeaddrinfo(gCIPInternalVars.addrinfo);
 
         return CAN_IP_ERROR_NET;
     }
 
     /* set socket options */
     errno = 0;
-    if(0 > setsockopt(gCIPInternalVars.canSocket, SOL_SOCKET, SO_BROADCAST, (const void *)&lBroadcastPermission, sizeof(int))) {
+
+    /* Configure the socket for broadcast */
+    const int lBroadcastPermission = 1;
+    if(0 > setsockopt(gCIPInternalVars.canSocket, SOL_SOCKET, SO_BROADCAST, (const void *)&lBroadcastPermission, sizeof(lBroadcastPermission))) {
         printf("[ERROR] <CIP_initcanSocket> setsockopt SO_BROADCAST failed !\n");
         if(0 != errno) {
             printf("        errno = %d (%s)\n", errno, strerror(errno));
         }
         return CAN_IP_ERROR_NET;
     }
-    if(0 > setsockopt(gCIPInternalVars.canSocket, SOL_SOCKET, SO_REUSEADDR, (const void *)&lBroadcastPermission, sizeof(int))) {
+
+    /* Set the address to be reusable */
+    int lEnable = 1;
+    if(0 > setsockopt(gCIPInternalVars.canSocket, SOL_SOCKET, SO_REUSEADDR, (const void *)&lEnable, sizeof(lEnable))) {
         printf("[ERROR] <CIP_initcanSocket> setsockopt SO_REUSEADDR failed !\n");
         if(0 != errno) {
             printf("        errno = %d (%s)\n", errno, strerror(errno));
         }
         return CAN_IP_ERROR_NET;
     }
-    if(0 > setsockopt(gCIPInternalVars.canSocket, SOL_SOCKET, SO_REUSEPORT, (const void *)&lBroadcastPermission, sizeof(int))) {
+
+    /* Set the port to be reusable */
+    if(0 > setsockopt(gCIPInternalVars.canSocket, SOL_SOCKET, SO_REUSEPORT, (const void *)&lEnable, sizeof(lEnable))) {
         printf("[ERROR] <CIP_initcanSocket> setsockopt SO_REUSEPORT failed !\n");
         if(0 != errno) {
             printf("        errno = %d (%s)\n", errno, strerror(errno));
@@ -123,15 +144,39 @@ cipErrorCode_t CIP_initCanSocket(const cipID_t pID) {
         return CAN_IP_ERROR_NET;
     }
 
-    /* Bind socket */
+    /* Get socket information */
+    // struct addrinfo lHints = {
+    //     .ai_family = AF_UNSPEC,
+    //     .ai_socktype = SOCK_DGRAM,
+    //     .ai_protocol = IPPROTO_UDP
+    // };
+
+    // char lPortStr[16U] = "";
+    // if(0 > snprintf(lPortStr, 16U, "%d", gCIPInternalVars.canPort)) {
+    //     printf("[ERROR] <CIP_initcanSocket> snprintf for port failed !\n");
+    //     return CAN_IP_ERROR_SYS;
+    // }
+
+    // int lFctReturn = getaddrinfo(gCIPInternalVars.canIP, lPortStr, &lHints, &gCIPInternalVars.addrinfo);
+    // if(0 != lFctReturn || NULL == gCIPInternalVars.addrinfo) {
+    //     printf("[ERROR] <CIP_initcanSocket> getaddrinfo failed !\n");
+    //     printf("        Invalid address (%s) or port (%d)\n", gCIPInternalVars.canIP, gCIPInternalVars.canPort);
+    //     return CAN_IP_ERROR_NET;
+    // }
+
+    /* Bind socket for reception */
     errno = 0;
-    if(0 > bind(gCIPInternalVars.canSocket, (struct sockaddr *)&gCIPInternalVars.socketInAddress, sAddrLen)) {
+    if(0 > bind(gCIPInternalVars.canSocket, (struct sockaddr *)&gCIPInternalVars.socketInAddress, sizeof(gCIPInternalVars.socketInAddress))) {
         printf("[ERROR] <CIP_initcanSocket> bind failed !\n");
         if(0 != errno) {
             printf("        errno = %d (%s)\n", errno, strerror(errno));
         }
         return CAN_IP_ERROR_NET;
     }
+
+    /* Set the sockInAddress to the specified broadcast address for sending */
+    gCIPInternalVars.socketInAddress.sin_addr.s_addr = inet_addr("255.255.255.255");
+    //printf("[DEBUG] socketInAddress.sin_addr.s_addr = %ld\n", gCIPInternalVars.socketInAddress.sin_addr.s_addr);
 
     /* Socket initialized */
     return CAN_IP_ERROR_NONE;

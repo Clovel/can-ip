@@ -55,12 +55,14 @@ cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * 
     }
 
     *pReadBytes = 0;
-    // socklen_t lAddrLen = sAddrLen;
+    struct sockaddr_in lSrcAddr;
+    socklen_t lSrcAddrLen = sizeof(lSrcAddr);
+    char lSrcIPAddr[INET_ADDRSTRLEN] = "";
     
     /* Receive the CAN frame */
-    // *pReadBytes = recvfrom(gCIPInternalVars.canSocket, (void *)pMsg, sizeof(cipMessage_t), 0, 
-    //     (struct sockaddr *)&gCIPInternalVars.socketInAddress, &lAddrLen);
-    *pReadBytes = recv(gCIPInternalVars.canSocket, (void *)pMsg, sizeof(cipMessage_t), 0);
+    *pReadBytes = recvfrom(gCIPInternalVars.canSocket, (void *)pMsg, sizeof(cipMessage_t), 0, 
+        (struct sockaddr *)&lSrcAddr, &lSrcAddrLen);
+    //*pReadBytes = recv(gCIPInternalVars.canSocket, (void *)pMsg, sizeof(cipMessage_t), 0);
     if(0 > *pReadBytes) {
         if(EAGAIN != errno && EWOULDBLOCK != errno) {
             printf("[ERROR] <CIP_send> recvfrom failed !\n");
@@ -74,7 +76,10 @@ cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * 
     } else if (0 == *pReadBytes) {
         /* Nothing was read from the socket */
     } else {
-        //printf("[DEBUG] <CIP_send> Received %ld bytes\n", *pReadBytes);
+        /* We got our message */
+        
+        // inet_ntop(PF_INET, &lSrcAddr.sin_addr, lSrcIPAddr, INET_ADDRSTRLEN);
+        // printf("[DEBUG] <CIP_send> Received %ld bytes from %s\n", *pReadBytes, lSrcIPAddr, lSrcAddrLen);
     }
 
     pthread_mutex_unlock(&gCIPInternalVars.mutex);

@@ -25,7 +25,7 @@
 /* Static variables ------------------------------------ */
 
 /* Extern variables ------------------------------------ */
-extern cipInternalStruct_t gCIPInternalVars;
+extern cipInternalStruct_t gCIP;
 
 
 cipErrorCode_t CIP_send(const cipID_t pID,
@@ -34,17 +34,17 @@ cipErrorCode_t CIP_send(const cipID_t pID,
     const uint8_t * const pData,
     const uint32_t pFlags)
 {
-    pthread_mutex_lock(&gCIPInternalVars.mutex);
+    pthread_mutex_lock(&gCIP.mutex);
 
     /* Check the ID */
-    if(pID != gCIPInternalVars.cipInstanceID) {
+    if(pID != gCIP.cipInstanceID) {
         printf("[ERROR] <CIP_send> No CAN-IP module has the ID %u\n", pID);
         return CAN_IP_ERROR_ARG;
     }
 
     /* Check if the module is already initialized */
-    if(!gCIPInternalVars.isInitialized) {
-        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIPInternalVars.cipInstanceID);
+    if(!gCIP.isInitialized) {
+        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
         return CAN_IP_ERROR_NOT_INIT;
     }
 
@@ -59,13 +59,13 @@ cipErrorCode_t CIP_send(const cipID_t pID,
     }
     
     /* Set the random ID in the message */
-    lMsg.randID = gCIPInternalVars.randID;
+    lMsg.randID = gCIP.randID;
 
     ssize_t lSentBytes = 0;
 
     errno = 0;
-    lSentBytes = sendto(gCIPInternalVars.canSocket, (const void *)&lMsg, sizeof(cipMessage_t), 0, 
-        (const struct sockaddr *)&gCIPInternalVars.socketInAddress, sizeof(gCIPInternalVars.socketInAddress));
+    lSentBytes = sendto(gCIP.canSocket, (const void *)&lMsg, sizeof(cipMessage_t), 0, 
+        (const struct sockaddr *)&gCIP.socketInAddress, sizeof(gCIP.socketInAddress));
     if(sizeof(cipMessage_t) != lSentBytes) {
         printf("[ERROR] <CIP_send> sendto failed !\n");
         if(0 != errno) {
@@ -74,7 +74,7 @@ cipErrorCode_t CIP_send(const cipID_t pID,
         return CAN_IP_ERROR_NET;
     }
 
-    pthread_mutex_unlock(&gCIPInternalVars.mutex);
+    pthread_mutex_unlock(&gCIP.mutex);
 
     return CAN_IP_ERROR_NONE;
 }

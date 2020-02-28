@@ -26,7 +26,7 @@
 static pthread_t sThread = 0;
 
 /* Extern variables ------------------------------------ */
-extern cipInternalStruct_t gCIPInternalVars;
+extern cipInternalStruct_t gCIP;
 
 /* Thread management functions ------------------------- */
 cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID,
@@ -34,7 +34,7 @@ cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID,
     const cipPutMessageFct_t pFct)
 {
     /* Check the ID */
-    if(pID != gCIPInternalVars.cipInstanceID) {
+    if(pID != gCIP.cipInstanceID) {
         printf("[ERROR] <CIP_setPutMessageFunction> No CAN-IP module has the ID %u\n", pID);
         return CAN_IP_ERROR_ARG;
     }
@@ -44,15 +44,15 @@ cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID,
         return CAN_IP_ERROR_ARG;
     }
 
-    gCIPInternalVars.callerID      = pCallerID;
-    gCIPInternalVars.putMessageFct = pFct;
+    gCIP.callerID      = pCallerID;
+    gCIP.putMessageFct = pFct;
 
     return CAN_IP_ERROR_NONE;
 }
 
 static void CIP_rxThreadCleanup(void *pPtr) {
     (void)pPtr;
-    gCIPInternalVars.rxThreadOn = false;
+    gCIP.rxThreadOn = false;
 }
 
 static void CIP_rxThread(const cipID_t * const pID) {
@@ -66,18 +66,18 @@ static void CIP_rxThread(const cipID_t * const pID) {
     const cipID_t lID = *pID;
 
     /* Check the ID */
-    if(lID != gCIPInternalVars.cipInstanceID) {
+    if(lID != gCIP.cipInstanceID) {
         printf("[ERROR] <CIP_rxThread> No CAN-IP module has the ID %u\n", lID);
         return;
     }
 
     /* Check if the module is already initialized */
-    if(!gCIPInternalVars.isInitialized) {
-        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIPInternalVars.cipInstanceID);
+    if(!gCIP.isInitialized) {
+        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
         return;
     }
 
-    if(NULL == gCIPInternalVars.putMessageFct) {
+    if(NULL == gCIP.putMessageFct) {
         printf("[ERROR] <CIP_rxThread> Message buffer getter function is NULL.\n");
         return;
     }
@@ -89,7 +89,7 @@ static void CIP_rxThread(const cipID_t * const pID) {
     /* Starting thread routine */
     pthread_cleanup_push((void (*)(void *))CIP_rxThreadCleanup, NULL);
 
-    gCIPInternalVars.rxThreadOn = true;
+    gCIP.rxThreadOn = true;
 
     /* Infinite Rx loop */
     printf("[DEBUG] <CIP_rxThread> Starting RX thread.\n");
@@ -116,13 +116,13 @@ static void CIP_rxThread(const cipID_t * const pID) {
         }
 
         /* Check if the message is a loopback message from this instance of CIP */
-        if(gCIPInternalVars.randID == lMsg.randID) {
+        if(gCIP.randID == lMsg.randID) {
             /* We sent this ! Ignoring... */
             continue;
         }
 
         /* Get buffer to store this data */
-        lGetBufferError = gCIPInternalVars.putMessageFct(gCIPInternalVars.callerID, lMsg.id, lMsg.size, lMsg.data, lMsg.flags);
+        lGetBufferError = gCIP.putMessageFct(gCIP.callerID, lMsg.id, lMsg.size, lMsg.data, lMsg.flags);
         if(0 != lGetBufferError) {
             printf("[ERROR] <CIP_rxThread> putMessageFct callback failed w/ error code %u\n", lErrorCode);
             break;
@@ -133,7 +133,7 @@ static void CIP_rxThread(const cipID_t * const pID) {
 
     printf("[ERROR] <CIP_rxThread> RX thread shut down. (error code = %d)\n", lErrorCode);
 
-    gCIPInternalVars.rxThreadOn = false;
+    gCIP.rxThreadOn = false;
 
     /* Mandatory pop */
     pthread_cleanup_pop(1);
@@ -141,12 +141,12 @@ static void CIP_rxThread(const cipID_t * const pID) {
 
 cipErrorCode_t CIP_startRxThread(const cipID_t pID) {
     /* Check the ID */
-    if(pID != gCIPInternalVars.cipInstanceID) {
+    if(pID != gCIP.cipInstanceID) {
         printf("[ERROR] <CIP_startRxThread> No CAN-IP module has the ID %u\n", pID);
         return CAN_IP_ERROR_ARG;
     }
 
-    if(NULL == gCIPInternalVars.putMessageFct) {
+    if(NULL == gCIP.putMessageFct) {
         printf("[ERROR] <CIP_startRxThread> Message buffer getter function is NULL.\n");
         return CAN_IP_ERROR_CONFIG;
     }
@@ -165,7 +165,7 @@ cipErrorCode_t CIP_startRxThread(const cipID_t pID) {
 
 cipErrorCode_t CIP_isRxThreadOn(const cipID_t pID, bool * const pOn) {
     /* Check the ID */
-    if(pID != gCIPInternalVars.cipInstanceID) {
+    if(pID != gCIP.cipInstanceID) {
         printf("[ERROR] <CIP_isRxThreadOn> No CAN-IP module has the ID %u\n", pID);
         return CAN_IP_ERROR_ARG;
     }
@@ -176,7 +176,7 @@ cipErrorCode_t CIP_isRxThreadOn(const cipID_t pID, bool * const pOn) {
         return CAN_IP_ERROR_ARG;
     }
 
-    *pOn = gCIPInternalVars.rxThreadOn;
+    *pOn = gCIP.rxThreadOn;
 
     return CAN_IP_ERROR_NONE;
 }

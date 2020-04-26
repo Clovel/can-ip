@@ -51,7 +51,7 @@ typedef cipMode_t canMode_t;
 typedef uint8_t cipID_t;
 typedef int cipPort_t;
 
-typedef int (*cipPutMessageFct_t)(const uint8_t, const uint32_t, const uint8_t, const uint8_t * const, const uint32_t);
+typedef int (*cipPutMessageFct_t)(const uint32_t, const uint8_t, const uint8_t * const, const uint32_t);
 
 /* CAN over IP interface ------------------------------- */
 /**
@@ -145,7 +145,7 @@ cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * 
  * 
  * @return Error code
  */
-cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID, const uint8_t pCallerID, const cipPutMessageFct_t pFct);
+cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID, const cipPutMessageFct_t pFct);
 
 /**
  * @brief Print a CAN over IP message (long format)

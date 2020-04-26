@@ -30,7 +30,6 @@ extern cipInternalStruct_t gCIP;
 
 /* Thread management functions ------------------------- */
 cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID,
-    const uint8_t pCallerID,
     const cipPutMessageFct_t pFct)
 {
     /* Check the ID */
@@ -44,7 +43,6 @@ cipErrorCode_t CIP_setPutMessageFunction(const cipID_t pID,
         return CAN_IP_ERROR_ARG;
     }
 
-    gCIP.callerID      = pCallerID;
     gCIP.putMessageFct = pFct;
 
     return CAN_IP_ERROR_NONE;
@@ -122,7 +120,7 @@ static void CIP_rxThread(const cipID_t * const pID) {
         }
 
         /* Get buffer to store this data */
-        lGetBufferError = gCIP.putMessageFct(gCIP.callerID, lMsg.id, lMsg.size, lMsg.data, lMsg.flags);
+        lGetBufferError = gCIP.putMessageFct(lMsg.id, lMsg.size, lMsg.data, lMsg.flags);
         if(0 != lGetBufferError) {
             printf("[ERROR] <CIP_rxThread> putMessageFct callback failed w/ error code %u\n", lErrorCode);
             break;

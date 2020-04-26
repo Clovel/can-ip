@@ -26,14 +26,11 @@
 extern void CIP_printMessageShort(const cipMessage_t * const pMsg);
 
 /* Support functions ----------------------------------- */
-int inputMessage(const uint8_t pID, 
-    const uint32_t pCOBID,
+int inputMessage(const uint32_t pCOBID,
     const uint8_t pSize,
     const uint8_t * const pData,
     const uint32_t pFlags)
 {
-    (void)pID;
-
     /* Set up CAN message */
     cipMessage_t lMsg;
     lMsg.id = pCOBID;
@@ -64,7 +61,7 @@ int main(const int argc, const char * const * const argv) {
         exit(EXIT_FAILURE);
     }
 
-    if(1U != (lErrorCode = CIP_setPutMessageFunction(0U, 0U, inputMessage))) {
+    if(1U != (lErrorCode = CIP_setPutMessageFunction(0U, inputMessage))) {
         printf("[ERROR] CIP_setPutMessageFunction failed w/ error code %u.\n", lErrorCode);
         exit(EXIT_FAILURE);
     }

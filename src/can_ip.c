@@ -78,7 +78,6 @@ cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPo
 
     /* Initialize thread related variables */
     gCIP.rxThreadOn    = false;
-    gCIP.callerID      = 0U;
     gCIP.putMessageFct = NULL;
 
     gCIP.isInitialized = true;

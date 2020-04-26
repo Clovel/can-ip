@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <sys/ioctl.h>
 
 /* errno */
 #include <errno.h>
@@ -28,6 +29,45 @@
 
 /* Extern variables ------------------------------------ */
 extern cipInternalStruct_t gCIP;
+
+/* CAN reception functions ----------------------------- */
+cipErrorCode_t CIP_msgAvail(const cipID_t pID, bool * const pMsgAvail) {
+    pthread_mutex_lock(&gCIP.mutex);
+
+    /* Check the argument pointer */
+    if(NULL == pMsgAvail) {
+        printf("[ERROR] <CIP_msgAvail> Output pointer argument is NULL\n");
+        return CAN_IP_ERROR_ARG;
+    }
+
+    /* Check the ID */
+    if(pID != gCIP.cipInstanceID) {
+        printf("[ERROR] <CIP_msgAvail> No CAN-IP module has the ID %u\n", pID);
+        return CAN_IP_ERROR_ARG;
+    }
+
+    /* Check the socket if there are enough bytes to compose a CAN message */
+    int lByteCount = 0;
+    errno = 0;
+    if(0 > ioctl(gCIP.canSocket, FIONREAD, &lByteCount)) {
+        printf("[ERROR] <CIP_msgAvail> ioctl failed\n");
+        if(0 != errno) {
+            printf("        errno = %d (%s)\n", errno, strerror(errno));
+        }
+
+        *pMsgAvail = false;
+
+        pthread_mutex_unlock(&gCIP.mutex);
+
+        return CAN_IP_ERROR_NET;
+    }
+
+    pthread_mutex_unlock(&gCIP.mutex);
+
+    *pMsgAvail = sizeof(cipMessage_t) <= lByteCount;
+
+    return CAN_IP_ERROR_NONE;
+}
 
 cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes) {
     pthread_mutex_lock(&gCIP.mutex);

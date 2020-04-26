@@ -83,6 +83,7 @@ static void CIP_rxThread(const cipID_t * const pID) {
     cipErrorCode_t  lErrorCode      = CAN_IP_ERROR_NONE;
     int             lGetBufferError = 0;
     ssize_t         lReadBytes      = 0;
+    bool            lMsgAvail       = false;
 
     /* Starting thread routine */
     pthread_cleanup_push((void (*)(void *))CIP_rxThreadCleanup, NULL);
@@ -95,7 +96,18 @@ static void CIP_rxThread(const cipID_t * const pID) {
         /* Initialize a CIP message */
         cipMessage_t lMsg;
         memset(&lMsg, 0, sizeof(cipMessage_t));
-        
+
+        /* Check if a message is available */
+        if(CAN_IP_ERROR_NONE != CIP_msgAvail(lID, &lMsgAvail)) {
+            printf("[ERROR] <CIP_rxThread> CIP_msgAvail failed w/ error code %u\n", lErrorCode);
+            break;
+        }
+
+        if(!lMsgAvail) {
+            /* Message not available, don't even bother trying to read the socket */
+            break;
+        }
+
         /* Reading a CAN message */
         lErrorCode = CIP_recv(lID, &lMsg, &lReadBytes);
         if(CAN_IP_ERROR_NONE != lErrorCode) {

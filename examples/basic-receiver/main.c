@@ -62,14 +62,14 @@ int main(const int argc, const char * const * const argv) {
 
     /* Receive the CAN message over IP */
     while(lErrorCode == CAN_IP_ERROR_NONE) {
-        lErrorCode = CIP_recv(0U, &lMsg, &lReadBytes);
+        lErrorCode = CIP_recvMsgStruct(0U, &lMsg, &lReadBytes);
         if(0 < lReadBytes && sizeof(cipMessage_t) == lReadBytes) {
             CIP_printMessageShort(&lMsg);
         }
     }
 
     if(CAN_IP_ERROR_NONE != lErrorCode) {
-        printf("[ERROR] CIP_recv failed w/ error code %u.\n", lErrorCode);
+        printf("[ERROR] CIP_recvMsgStruct failed w/ error code %u.\n", lErrorCode);
         exit(EXIT_FAILURE);
     }
 

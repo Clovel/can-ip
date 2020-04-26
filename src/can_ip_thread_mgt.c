@@ -103,13 +103,14 @@ static void CIP_rxThread(const cipID_t * const pID) {
             break;
         }
 
-        if(!lMsgAvail) {
-            /* Message not available, don't even bother trying to read the socket */
-            break;
-        }
+        /* Check if message is available (not necessary here) */
+        // if(!lMsgAvail) {
+        //     /* Message not available, don't even bother trying to read the socket */
+        //     continue;
+        // }
 
         /* Reading a CAN message */
-        lErrorCode = CIP_recv(lID, &lMsg, &lReadBytes);
+        lErrorCode = CIP_recvMsgStruct(lID, &lMsg, &lReadBytes);
         if(CAN_IP_ERROR_NONE != lErrorCode) {
             printf("[ERROR] <CIP_rxThread> CIP_recv failed w/ error code %u\n", lErrorCode);
             break;

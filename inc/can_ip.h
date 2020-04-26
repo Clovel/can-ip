@@ -141,11 +141,33 @@ cipErrorCode_t CIP_msgAvail(const cipID_t pID, bool * const pMsgAvail);
  * @brief CAN over IP recieve
  * Use this function to get a CAN message
  * 
- * @param[in]   pID     ID of the driver used.
+ * @param[in]   pID         ID of the driver used.
+ * @param[out]  pMsg        Read message COB-ID
+ * @param[out]  pLen        Read message length
+ * @param[out]  pData       Read message payload
+ * @param[out]  pFlags      Read message flags
+ * @param[out]  pReadBytes  Number of bytes read from the socket
  * 
  * @return error_code
  */
-cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes);
+cipErrorCode_t CIP_recv(const cipID_t pID, 
+    uint32_t * const pCOBID,
+    uint8_t * const pLen,
+    uint8_t * const pData,
+    uint32_t * const pFlags,
+    ssize_t * const pReadBytes);
+
+/**
+ * @brief CAN over IP recieve
+ * Use this function to get a CAN message
+ * 
+ * @param[in]   pID         ID of the driver used.
+ * @param[out]  pMsg        Read message
+ * @param[out]  pReadBytes  Number of bytes read from the socket
+ * 
+ * @return error_code
+ */
+cipErrorCode_t CIP_recvMsgStruct(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes);
 
 /**
  * @brief Sets the function used to give a message to

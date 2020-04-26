@@ -64,14 +64,88 @@ cipErrorCode_t CIP_msgAvail(const cipID_t pID, bool * const pMsgAvail) {
 
     pthread_mutex_unlock(&gCIP.mutex);
 
-    *pMsgAvail = sizeof(cipMessage_t) <= lByteCount;
+    *pMsgAvail = sizeof(cipMessage_t) <= (size_t)lByteCount;
+
+    /* Check if the message is one of our own that looped back */
+    if(*pMsgAvail) {
+        struct sockaddr_in lSrcAddr;
+        socklen_t lSrcAddrLen = sizeof(lSrcAddr);
+        cipMessage_t lMsg;
+        memset(&lMsg, 0, sizeof(cipMessage_t));
+        lByteCount = recvfrom(gCIP.canSocket, (void *)&lMsg, sizeof(cipMessage_t), MSG_PEEK | MSG_DONTWAIT, 
+            (struct sockaddr *)&lSrcAddr, &lSrcAddrLen);
+        
+        /* If the message is a loopback msg, read it for real to flush it out */
+        if(gCIP.randID == lMsg.randID) {
+            /* TODO : Find a better implementation than this */
+            lByteCount = recvfrom(gCIP.canSocket, (void *)&lMsg, sizeof(cipMessage_t), MSG_PEEK | MSG_DONTWAIT, 
+                (struct sockaddr *)&lSrcAddr, &lSrcAddrLen);
+            *pMsgAvail = false;
+        }
+    }
 
     return CAN_IP_ERROR_NONE;
 }
 
-cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes) {
-    pthread_mutex_lock(&gCIP.mutex);
-    
+cipErrorCode_t CIP_recv(const cipID_t pID, 
+    uint32_t * const pCOBID,
+    uint8_t * const pLen,
+    uint8_t * const pData,
+    uint32_t * const pFlags,
+    ssize_t * const pReadBytes)
+{
+    /* Check the ID */
+    if(pID != gCIP.cipInstanceID) {
+        printf("[ERROR] <CIP_recv> No CAN-IP module has the ID %u\n", pID);
+        return CAN_IP_ERROR_ARG;
+    }
+
+    /* Check if the module is already initialized */
+    if(!gCIP.isInitialized) {
+        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
+        return CAN_IP_ERROR_NOT_INIT;
+    }
+
+    /* Check arguments */
+    if(NULL == pCOBID) {
+        printf("[ERROR] <CIP_rxThread> pCOBID output pointer is NULL\n");
+        return CAN_IP_ERROR_ARG;
+    }
+    if(NULL == pLen) {
+        printf("[ERROR] <CIP_rxThread> pLen output pointer is NULL\n");
+        return CAN_IP_ERROR_ARG;
+    }
+    if(NULL == pData) {
+        printf("[ERROR] <CIP_rxThread> pData output pointer is NULL\n");
+        return CAN_IP_ERROR_ARG;
+    }
+    if(NULL == pFlags) {
+        printf("[ERROR] <CIP_rxThread> pFlags output pointer is NULL\n");
+        return CAN_IP_ERROR_ARG;
+    }
+    if(NULL == pReadBytes) {
+        printf("[ERROR] <CIP_rxThread> pReadBytes output pointer is NULL\n");
+        return CAN_IP_ERROR_ARG;
+    }
+
+    cipMessage_t lMsg;
+    memset(&lMsg, 0, sizeof(cipMessage_t));
+    cipErrorCode_t lErrorCode = CIP_recvMsgStruct(pID, &lMsg, pReadBytes);
+    if(CAN_IP_ERROR_NONE != lErrorCode) {
+        printf("[ERROR] <CIP_send> CIP_recvMsgStruct failed !\n");
+    } else {
+        *pCOBID = lMsg.id;
+        *pLen   = lMsg.size;
+        *pFlags = lMsg.flags;
+        for(uint8_t i = 0U; (i < *pLen) && (i < CAN_MESSAGE_MAX_SIZE); ++i) {
+            pData[i] = lMsg.data[i];
+        }
+    }
+
+    return lErrorCode;
+}
+
+cipErrorCode_t CIP_recvMsgStruct(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes) {
     /* Check the ID */
     if(pID != gCIP.cipInstanceID) {
         printf("[ERROR] <CIP_recv> No CAN-IP module has the ID %u\n", pID);
@@ -98,6 +172,8 @@ cipErrorCode_t CIP_recv(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * 
     struct sockaddr_in lSrcAddr;
     socklen_t lSrcAddrLen = sizeof(lSrcAddr);
     //char lSrcIPAddr[INET_ADDRSTRLEN] = "";
+
+    pthread_mutex_lock(&gCIP.mutex);
     
     /* Receive the CAN frame */
     *pReadBytes = recvfrom(gCIP.canSocket, (void *)pMsg, sizeof(cipMessage_t), 0, 

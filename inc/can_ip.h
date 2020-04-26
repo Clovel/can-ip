@@ -127,6 +127,17 @@ cipErrorCode_t CIP_send(const cipID_t pID,
     const uint32_t pFlags);
 
 /**
+ * @brief CAN over IP check for available message
+ * Use this function to check for an available CAN message
+ * 
+ * @param[in]   pID         ID of the driver used.
+ * @param[out]  pMsgAvail   Output ptr
+ * 
+ * @return error_code
+ */
+cipErrorCode_t CIP_msgAvail(const cipID_t pID, bool * const pMsgAvail);
+
+/**
  * @brief CAN over IP recieve
  * Use this function to get a CAN message
  * 

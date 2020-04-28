@@ -106,29 +106,29 @@ cipErrorCode_t CIP_recv(const cipID_t pID,
 
     /* Check if the module is already initialized */
     if(!gCIP.isInitialized) {
-        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
+        printf("[ERROR] <CIP_recv> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
         return CAN_IP_ERROR_NOT_INIT;
     }
 
     /* Check arguments */
     if(NULL == pCOBID) {
-        printf("[ERROR] <CIP_rxThread> pCOBID output pointer is NULL\n");
+        printf("[ERROR] <CIP_recv> pCOBID output pointer is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
     if(NULL == pLen) {
-        printf("[ERROR] <CIP_rxThread> pLen output pointer is NULL\n");
+        printf("[ERROR] <CIP_recv> pLen output pointer is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
     if(NULL == pData) {
-        printf("[ERROR] <CIP_rxThread> pData output pointer is NULL\n");
+        printf("[ERROR] <CIP_recv> pData output pointer is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
     if(NULL == pFlags) {
-        printf("[ERROR] <CIP_rxThread> pFlags output pointer is NULL\n");
+        printf("[ERROR] <CIP_recv> pFlags output pointer is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
     if(NULL == pReadBytes) {
-        printf("[ERROR] <CIP_rxThread> pReadBytes output pointer is NULL\n");
+        printf("[ERROR] <CIP_recv> pReadBytes output pointer is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
 
@@ -152,23 +152,23 @@ cipErrorCode_t CIP_recv(const cipID_t pID,
 cipErrorCode_t CIP_recvMsgStruct(const cipID_t pID, cipMessage_t * const pMsg, ssize_t * const pReadBytes) {
     /* Check the ID */
     if(pID != gCIP.cipInstanceID) {
-        printf("[ERROR] <CIP_recv> No CAN-IP module has the ID %u\n", pID);
+        printf("[ERROR] <CIP_recvMsgStruct> No CAN-IP module has the ID %u\n", pID);
         return CAN_IP_ERROR_ARG;
     }
 
     /* Check if the module is already initialized */
     if(!gCIP.isInitialized) {
-        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
+        printf("[ERROR] <CIP_recvMsgStruct> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
         return CAN_IP_ERROR_NOT_INIT;
     }
 
     if(NULL == pMsg) {
-        printf("[ERROR] <CIP_rxThread> Message is NULL\n");
+        printf("[ERROR] <CIP_recvMsgStruct> Message is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
 
     if(NULL == pReadBytes) {
-        printf("[ERROR] <CIP_rxThread> pReadBytes output pointer is NULL\n");
+        printf("[ERROR] <CIP_recvMsgStruct> pReadBytes output pointer is NULL\n");
         return CAN_IP_ERROR_ARG;
     }
 

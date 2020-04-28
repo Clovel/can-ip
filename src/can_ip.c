@@ -148,13 +148,13 @@ cipErrorCode_t CIP_process(const cipID_t pID) {
 
     /* Check if the module is already initialized */
     if(!gCIP.isInitialized) {
-        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
+        printf("[ERROR] <CIP_process> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
         return CAN_IP_ERROR_NOT_INIT;
     }
 
     if(gCIP.rxThreadEnabled) {
         if(NULL == gCIP.putMessageFct) {
-            printf("[ERROR] <CIP_rxThread> Message buffer getter function is NULL.\n");
+            printf("[ERROR] <CIP_process> Message buffer getter function is NULL.\n");
             return CAN_IP_ERROR_CONFIG;
         }
 
@@ -164,7 +164,7 @@ cipErrorCode_t CIP_process(const cipID_t pID) {
             /* Start reception thread */
             lErrorCode = CIP_startRxThread(pID);
             if(CAN_IP_ERROR_NONE != lErrorCode) {
-                printf("[ERROR] <CIP_rxThread> CIP_startRxThread failed w/ error code %u\n", lErrorCode);
+                printf("[ERROR] <CIP_process> CIP_startRxThread failed w/ error code %u\n", lErrorCode);
                 return CAN_IP_ERROR_SYS;
             }
         }

@@ -44,7 +44,7 @@ cipErrorCode_t CIP_send(const cipID_t pID,
 
     /* Check if the module is already initialized */
     if(!gCIP.isInitialized) {
-        printf("[ERROR] <CIP_rxThread> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
+        printf("[ERROR] <CIP_send> CAN-IP module %u is not initialized.\n", gCIP.cipInstanceID);
         return CAN_IP_ERROR_NOT_INIT;
     }
 

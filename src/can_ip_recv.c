@@ -72,13 +72,17 @@ cipErrorCode_t CIP_msgAvail(const cipID_t pID, bool * const pMsgAvail) {
         socklen_t lSrcAddrLen = sizeof(lSrcAddr);
         cipMessage_t lMsg;
         memset(&lMsg, 0, sizeof(cipMessage_t));
+
+        /* First read to get the randID of the message */
         lByteCount = recvfrom(gCIP.canSocket, (void *)&lMsg, sizeof(cipMessage_t), MSG_PEEK | MSG_DONTWAIT, 
             (struct sockaddr *)&lSrcAddr, &lSrcAddrLen);
         
         /* If the message is a loopback msg, read it for real to flush it out */
         if(gCIP.randID == lMsg.randID) {
             /* TODO : Find a better implementation than this */
-            lByteCount = recvfrom(gCIP.canSocket, (void *)&lMsg, sizeof(cipMessage_t), MSG_PEEK | MSG_DONTWAIT, 
+
+            /* Flush the message from the socket */
+            lByteCount = recvfrom(gCIP.canSocket, (void *)&lMsg, sizeof(cipMessage_t), 0, 
                 (struct sockaddr *)&lSrcAddr, &lSrcAddrLen);
             *pMsgAvail = false;
         }

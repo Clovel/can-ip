@@ -40,6 +40,7 @@ typedef struct _cipInternalVariables {
 
     /* Rx Thread */
     bool rxThreadOn;
+    bool rxThreadEnabled;
     cipPutMessageFct_t putMessageFct;
     pthread_mutex_t mutex;
 } cipInternalStruct_t;

@@ -34,7 +34,7 @@ int main(const int argc, const char * const * const argv) {
     unsigned int lErrorCode = 0U;
 
     /* Initialize the CAN over IP module */
-    if(1U != (lErrorCode = CIP_init(0U, CAN_IP_MODE_NORMAL, 15024))) {
+    if(1U != (lErrorCode = CIP_init(0U, CAN_IP_MODE_NORMAL, 15024, false))) {
         printf("[ERROR] CIP_init failed w/ error code %u.\n", lErrorCode);
         exit(EXIT_FAILURE);
     }

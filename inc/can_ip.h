@@ -70,7 +70,7 @@ cipErrorCode_t CIP_createModule(const cipID_t pID);
  * 
  * @return Error code
  */
-cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort);
+cipErrorCode_t CIP_init(const cipID_t pID, const cipMode_t pCIPMode, const cipPort_t pPort, const bool pThreaded);
 
 /**
  * @brief CAN over IP check for initialisation
@@ -88,7 +88,7 @@ cipErrorCode_t CIP_isInitialized(const cipID_t pID, bool * const pIsInitialized)
  * 
  * @return Error code
  */
-cipErrorCode_t CIP_reset(const cipID_t pID, const cipMode_t pCIPMode);
+cipErrorCode_t CIP_reset(const cipID_t pID, const cipMode_t pCIPMode, const bool pThreaded);
 
 /**
  * @brief CAN over IP stop
